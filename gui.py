@@ -17,6 +17,7 @@ class MainWindow(Tk):
     def __init__(self):
 
         super().__init__()
+        self.iconbitmap('Images\ChatRoomIcon.ico') #LogoIcon
         self.title('ChatRoom')
         self.geometry("400x600")
         self.resizable(False,False)
