@@ -55,9 +55,13 @@ class Client:
             we could iterate through to get the messages)
         """
         while True:
-            self.message = self.client.recv(2040).decode('utf-8')
-            print(self.message)
-            yield f"{self.message}"
+            try:
+                self.message = self.client.recv(2040).decode('utf-8')
+                print(self.message)
+                yield f"{self.message}"
+
+            except socket.error as err:
+                print(f'el error: \n\n {err}')
             
 
 
@@ -78,5 +82,6 @@ class Client:
 
         """
         self.client.send(f"{self.username}:\n   {message}\n\n".encode('utf-8'))
+
 
 

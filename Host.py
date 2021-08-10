@@ -1,5 +1,6 @@
 import socket
 from threading import Thread
+import sys
 
 
 class Host:
@@ -87,12 +88,25 @@ class Host:
         for user in self.OnlineUsers.values():
                 user.send(f' [{username}] Joined the Room \n'.encode('utf-8'))
 
-        while True:
-            #waits for a message
-            self.message = clientIp.recv(2040)
+        try:
+            while True:
+                #waits for a message
+                
+                self.message = clientIp.recv(2040)
+                print(self.message)
 
-            print(self.message)
-            #transmit the message to all the users on the Online Dict
-            for user in self.OnlineUsers.values():
-                user.send(self.message)
+                #transmit the message to all the users on the Online Dict
+                for user in self.OnlineUsers.values():
+                    user.send(self.message)
 
+        except socket.error as err:
+            print(f'el error \n{err}')
+            print(f"{username} ha abandonado la sala")
+            try:
+                for user in self.OnlineUsers.values():
+                        user.send(f"[{username}] Leaved the chat".encode("utf-8"))
+                        pass
+            except socket.error as err:
+                print(f'otro error \n {err}')
+            
+            

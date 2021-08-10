@@ -4,6 +4,7 @@ import socket, random
 from tkinter import *
 from Events import events
 from threading import Thread
+import sys
 
 
 class MainWindow(Tk):
@@ -17,7 +18,7 @@ class MainWindow(Tk):
     def __init__(self):
 
         super().__init__()
-        self.iconbitmap('Images\ChatRoomIcon.ico') #LogoIcon
+        self.iconbitmap('Images\ChatRoomIcon.ico')
         self.title('ChatRoom')
         self.geometry("400x600")
         self.resizable(False,False)
@@ -303,7 +304,6 @@ class MainWindow(Tk):
         Host(Ip,Port)
         print('hosting')
         Thread(target =self.on_joining_server).start()
-
     
     def on_joining_server(self):
         
@@ -349,8 +349,13 @@ class MainWindow(Tk):
         events.on_enter_pressed(self.IpEntry, self.PortEntry)
 
         #send entry event
-        events.on_enter_pressed_send(self.message_entry, lambda: Thread(target=self.sending_message).start())
+        events.on_enter_pressed_send(self.message_entry, self.sending_message)
 
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+
+    def on_exit(self):
+        self.destroy()
+        sys.exit(0)
 MainWindow()
 
 
