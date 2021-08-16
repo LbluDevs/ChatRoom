@@ -3,9 +3,10 @@ from Client import *
 import socket, random
 from tkinter import *
 from Events import events
-from threading import Thread
+from threading import *
 import sys
 
+programRunning = True
 
 class MainWindow(Tk):
     ScreenWd = 400
@@ -18,12 +19,15 @@ class MainWindow(Tk):
     def __init__(self):
 
         super().__init__()
+        global programRunning
+
         self.iconbitmap('Images\ChatRoomIcon.ico')
         self.title('ChatRoom')
         self.geometry("400x600")
         self.resizable(False,False)
         self.build()
-        self.client_conn  = Client()
+        self.client_conn  = Client(programRunning)
+
         self.mainloop()
         
 
@@ -38,6 +42,7 @@ class MainWindow(Tk):
         self.joinWindow()
         self.chat_screen()
         self.event_Handler()
+        self.threads()
 
     def image_Loader(self):
         self.CreatebtnBg = PhotoImage(file='images/CreateButton.png')
@@ -186,7 +191,7 @@ class MainWindow(Tk):
                 activebackground=self.deepBlue,
                 image = self.JoinBtnBg,
                 font=('Roboto',9,'bold'),
-                command= lambda: Thread(target=self.on_joining_server).start()
+                command= lambda: self.joiningSvThread.start()
              )
 
 
@@ -287,7 +292,7 @@ class MainWindow(Tk):
 
         self.JoinButton.config(
                 text='Create',
-                command=self.on_creating_server,
+                command=lambda: self.createSvThread.start(),
                 image=self.CreatebtnBg
               )
               
@@ -297,13 +302,15 @@ class MainWindow(Tk):
     
 
     def on_creating_server(self):
+        global programRunning
+
         Ip = self.IpEntry.get()
         Port = int(self.PortEntry.get())
         
 
-        Host(Ip,Port)
+        Host(Ip,Port,programRunning)
         print('hosting')
-        Thread(target =self.on_joining_server).start()
+        self.on_joining_server()
     
     def on_joining_server(self):
         
@@ -353,9 +360,19 @@ class MainWindow(Tk):
 
         self.protocol("WM_DELETE_WINDOW", self.on_exit)
 
+    def threads(self):
+        self.createSvThread = Thread(target=self.on_creating_server, daemon=True)
+        self.joiningSvThread = Thread(target=self.on_joining_server, daemon=True)
+
     def on_exit(self):
-        self.destroy()
+        global programRunning
+        programRunning = False
+        print(active_count())
         sys.exit(0)
-MainWindow()
+
+print(programRunning)
+
+if __name__=="__main__":
+    MainWindow()
 
 

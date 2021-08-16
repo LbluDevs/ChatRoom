@@ -3,7 +3,7 @@ from threading import Thread
 
 class Client:
 
-    def __init__(self):
+    def __init__(self, running):
         """Start the socket configurations
 
             define how the client will connect to the server
@@ -11,7 +11,8 @@ class Client:
         """
         
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-
+        self.run = running
+        
     def on_connect(self, Ip, Port, username):
         """
         Joins the server
@@ -54,7 +55,7 @@ class Client:
             the loop, it keeps the data in a generator obj, that then
             we could iterate through to get the messages)
         """
-        while True:
+        while self.run:
             try:
                 self.message = self.client.recv(2040).decode('utf-8')
                 print(self.message)

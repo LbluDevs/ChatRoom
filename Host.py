@@ -4,7 +4,7 @@ import sys
 
 
 class Host:
-    def __init__(self, Ip, Port):
+    def __init__(self, Ip, Port,Running):
         """Gets the user data
 
 
@@ -22,8 +22,9 @@ class Host:
         self.IP = Ip
         self.PORT = Port
         self.OnlineUsers = {}
+        self.run = Running
 
-        Thread(target=self.on_creating_connection).start()
+        Thread(target=self.on_creating_connection, daemon=True).start()
 
 
     def on_creating_connection(self):
@@ -61,7 +62,7 @@ class Host:
         client Ip
         """
 
-        while True:
+        while self.run:
             self.clientIp, self.clientAddr = self.server.accept()
             self.OnlineUsers[self.clientAddr] = self.clientIp
 
@@ -89,7 +90,7 @@ class Host:
                 user.send(f' [{username}] Joined the Room \n'.encode('utf-8'))
 
         try:
-            while True:
+            while self.run:
                 #waits for a message
                 
                 self.message = clientIp.recv(2040)
